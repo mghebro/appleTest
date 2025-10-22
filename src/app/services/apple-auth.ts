@@ -13,17 +13,19 @@ export class AppleAuthService {
 
   constructor(private http: HttpClient) {}
 
+  // Initialize Apple popup
   initAppleSignIn(): void {
     if (typeof window !== 'undefined' && window.AppleID) {
       window.AppleID.auth.init({
-        clientId: environment.appleClientId,
+        clientId: environment.appleClientId, // must match backend and Apple portal
         scope: 'name email',
-        redirectURI: environment.appleRedirectUri,
+        redirectURI: environment.appleRedirectUri, // must match portal
         usePopup: true
       });
     }
   }
 
+  // Trigger Apple Sign-In
   signInWithApple(): Observable<ApiResponse<LoginResponse>> {
     return from(this.triggerAppleSignIn()).pipe(
       switchMap((appleResponse) => this.sendToBackend(appleResponse)),
@@ -38,20 +40,26 @@ export class AppleAuthService {
     if (!window.AppleID) {
       throw new Error('Apple Sign In SDK not loaded');
     }
-    return await window.AppleID.auth.signIn();
+    const response = await window.AppleID.auth.signIn();
+    console.log('Apple authorization response:', response);
+    return response;
   }
 
   private sendToBackend(appleResponse: AppleSignInResponse): Observable<ApiResponse<LoginResponse>> {
     const request: AppleSignInRequest = {
       idToken: appleResponse.authorization.id_token,
       code: appleResponse.authorization.code,
-      user: appleResponse.user ? {
-        email: appleResponse.user.email,
-        name: appleResponse.user.name ? {
-          firstName: appleResponse.user.name.firstName || '',
-          lastName: appleResponse.user.name.lastName || ''
-        } : undefined
-      } : undefined
+      user: appleResponse.user
+        ? {
+            email: appleResponse.user.email,
+            name: appleResponse.user.name
+              ? {
+                  firstName: appleResponse.user.name.firstName || '',
+                  lastName: appleResponse.user.name.lastName || ''
+                }
+              : undefined
+          }
+        : undefined
     };
 
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });

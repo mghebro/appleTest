@@ -10,7 +10,7 @@ import { LoginResponse } from '../../models/apple-auth.models';
   styleUrls: ['./apple-signin.scss'],
 })
 export class AppleSigninComponent implements OnInit {
-  isLoading = false;
+   isLoading = false;
   error: string | null = null;
   user: LoginResponse | null = null;
 
@@ -37,7 +37,7 @@ export class AppleSigninComponent implements OnInit {
       error: (error) => {
         this.isLoading = false;
         this.error = error.error?.message || 'An error occurred during sign in';
-      },
+      }
     });
   }
 
