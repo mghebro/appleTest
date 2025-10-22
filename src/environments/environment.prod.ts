@@ -1,6 +1,6 @@
 export const environment = {
-  production: true,
-  apiUrl: 'http://localhost:5209',
+  production: false,
+  apiUrl: 'https://d0de21939d12.ngrok-free.app',
   appleClientId: 'com.appleAuth.ai.service',
-  appleRedirectUri: 'https://793e656eb26a.ngrok-free.app/auth/apple/callback'
+  appleRedirectUri: 'https://apple-test-ten.vercel.app/auth/apple/callback',
 };
