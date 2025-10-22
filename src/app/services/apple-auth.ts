@@ -3,24 +3,28 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, from, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { AppleSignInRequest, AppleSignInResponse, ApiResponse, LoginResponse } from '../models/apple-auth.models';
+import {
+  AppleSignInRequest,
+  AppleSignInResponse,
+  ApiResponse,
+  LoginResponse,
+} from '../models/apple-auth.models';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AppleAuthService {
   private readonly apiUrl = `${environment.apiUrl}/api/auth/apple-signin`;
 
   constructor(private http: HttpClient) {}
 
-  // Initialize Apple popup
   initAppleSignIn(): void {
     if (typeof window !== 'undefined' && window.AppleID) {
       window.AppleID.auth.init({
-        clientId: environment.appleClientId, // must match backend and Apple portal
+        clientId: environment.appleClientId,
         scope: 'name email',
         redirectURI: environment.appleRedirectUri, // must match portal
-        usePopup: true
+        usePopup: true,
       });
     }
   }
@@ -45,7 +49,9 @@ export class AppleAuthService {
     return response;
   }
 
-  private sendToBackend(appleResponse: AppleSignInResponse): Observable<ApiResponse<LoginResponse>> {
+  private sendToBackend(
+    appleResponse: AppleSignInResponse
+  ): Observable<ApiResponse<LoginResponse>> {
     const request: AppleSignInRequest = {
       idToken: appleResponse.authorization.id_token,
       code: appleResponse.authorization.code,
@@ -55,14 +61,17 @@ export class AppleAuthService {
             name: appleResponse.user.name
               ? {
                   firstName: appleResponse.user.name.firstName || '',
-                  lastName: appleResponse.user.name.lastName || ''
+                  lastName: appleResponse.user.name.lastName || '',
                 }
-              : undefined
+              : undefined,
           }
-        : undefined
+        : undefined,
     };
 
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<ApiResponse<LoginResponse>>(this.apiUrl, request, { headers });
+    return this.http.post<ApiResponse<LoginResponse>>(this.apiUrl, request, {
+      headers,
+      withCredentials: true,
+    });
   }
 }
