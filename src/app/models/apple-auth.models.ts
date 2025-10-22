@@ -15,6 +15,8 @@ export interface AppleSignInRequest {
 }
 
 export interface LoginResponse {
+  refreshToken: any;
+  accessToken: any;
   id: string;
   email: string;
   firstName: string;
